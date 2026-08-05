@@ -7,6 +7,7 @@ import userRoutes from './modules/user/routes';
 import { dot } from 'node:test/reporters';
 import { clear } from 'node:console';
 import authRoutes from './modules/auth/routes';
+import errorMiddleware from './modules/middleware/globalErrorMiddleware';
 
 const app: Express = express();
 
@@ -32,7 +33,7 @@ app.use('/health', (req: Request, res: Response) => {
   res.send('Hello World!');
 });
 
-// app.use(globalError)
+app.use(errorMiddleware);
 
 const server = async () => {
   await connectDb();

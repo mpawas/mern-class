@@ -3,7 +3,7 @@ import HttpException from '../exception/httpException';
 import mongoose from 'mongoose';
 
 interface ErrorResponse {
-  status: string;
+  status: 'failed' | 'error';
   message: string;
   stack?: string;
   code?: number | string;
@@ -20,7 +20,7 @@ const errorMiddleware = (
   let status = 500;
   let errorResponse: ErrorResponse = {
     status: 'error',
-    code: 500,
+    code: 'error',
     message: 'Internal server error',
   };
 
@@ -39,7 +39,7 @@ const errorMiddleware = (
     status = 400;
     const validationErrors = Object.values(error.errors).map(err => err.message);
     errorResponse = {
-      status: 'fail',
+      status: 'failed',
       message: 'Validation error',
       errors: validationErrors,
     };
@@ -49,7 +49,7 @@ const errorMiddleware = (
   if (error instanceof mongoose.Error.CastError) {
     status = 400;
     errorResponse = {
-      status: 'fail',
+      status: 'failed',
       message: `Invalid ${error.path}: ${error.value}`,
     };
   }
@@ -59,7 +59,7 @@ const errorMiddleware = (
     status = 400;
     const field = Object.keys((error as any).keyValue)[0];
     errorResponse = {
-      status: 'fail',
+      status: 'failed',
       message: `Duplicate value for ${field}. Please use another value.`,
     };
   }
@@ -68,7 +68,7 @@ const errorMiddleware = (
   if (error.name === 'JsonWebTokenError') {
     status = 401;
     errorResponse = {
-      status: 'fail',
+      status: 'failed',
       message: 'Invalid token. Please log in again.',
     };
   }
@@ -76,7 +76,7 @@ const errorMiddleware = (
   if (error.name === 'TokenExpiredError') {
     status = 401;
     errorResponse = {
-      status: 'fail',
+      status: 'failed',
       message: 'Your session has expired. Please log in again.',
     };
   }

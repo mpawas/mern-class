@@ -1,3 +1,5 @@
+import HttpException from '../exception/httpException';
+import UserNotFoundError from '../exception/someRandom';
 import User, { IUser } from './schema';
 import formatUserResponse from './utils';
 
@@ -12,16 +14,15 @@ export const createUserService = async (
 }> => {
   console.log('service initialized');
   if (!name || !email || !password) {
-    throw new Error('Please provide email, name, password');
+    throw new HttpException(400, 'Please provide email, name, password', 'user.not.found');
   }
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
-    throw new Error('user already exist');
+    throw new HttpException(402, 'user already exist');
   }
 
   const user = await User.create({ name, email, password });
-  console.log(user);
 
   return {
     statusCode: 201,
@@ -43,11 +44,11 @@ export const updateUserService = async (email: string, params: Partial<IUser>) =
 export const login = async (email: string, password: string) => {
   const user = await User.findOne({ email }).exec();
   if (!user) {
-    throw new Error('user is not available');
+    throw new UserNotFoundError(404, 'user not found');
   }
   const _true = user.password === password;
   if (!_true) {
-    throw new Error('password doesnpt match');
+    throw new HttpException(401, 'Please provide the valid emal and passowrd');
   }
   return { user };
 };
@@ -55,11 +56,11 @@ export const login = async (email: string, password: string) => {
 export const getUserByIdService = async (id: string) => {
   const user = await User.findById(id).exec();
   if (user) return user;
-  throw new Error('User not found');
+  throw new HttpException(404, 'User not found');
 };
 
 export const getUserByFilter = async (dob: string) => {
   const users = await User.find({ dob }).exec();
   if (users) users;
-  throw new Error('user not found');
+  throw new HttpException(404, 'user not found');
 };

@@ -1,9 +1,15 @@
 import HttpException from './httpException';
 
-class RandomError extends HttpException {
+class UserNotFoundError extends HttpException {
   constructor(status: number, message: string) {
-    super(status, message, 'random.string');
+    super(status, message, 'user.not.found');
   }
 }
 
-export default RandomError;
+export default UserNotFoundError;
+
+// {
+//   status: '404,
+//   code:"user.not.found",
+//   message:"abad"
+// }
